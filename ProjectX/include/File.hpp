@@ -23,6 +23,11 @@ namespace File
     }
 }
 
+void PrintCurrentPath()
+{
+    std::cout << "Current Path: " << FileSystem::current_path() << IO::endl;
+}
+
 namespace EXPERIMENTAL
 {
     // struct File

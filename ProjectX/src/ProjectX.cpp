@@ -1,11 +1,6 @@
 
 #include "ProjectX.hpp"
 
-void PrintCurrentPath()
-{
-    std::cout << "Current Path: " << FileSystem::current_path() << IO::endl;
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -81,7 +76,6 @@ int main(int argc, char *argv[])
     }
 
     FileSystem::path projectDir = FileSystem::current_path();
-    /*std::cout << "Project Dir: " << projectDir << IO::endl;*/
 
     /** 1. Create directory
      *  2. Change directory
@@ -108,15 +102,21 @@ int main(int argc, char *argv[])
         }
 
         FileSystem::current_path(relativePath);
-        
+
     } // End of second directory traversal.
     
-    //std::cout << "Relative Path: " << relativePath << IO::endl;
-    /*
-    FileSystem::create_directory(project.name());
-    FileSystem::current_path()
+    const auto sourceDirectoryPath  = FileSystem::relative("src");
+    const auto includeDirectoryPath = FileSystem::relative("include");
+
+    FileSystem::create_directory(sourceDirectoryPath);
+    FileSystem::create_directory(includeDirectoryPath);
 
 /*
+    //std::cout << "Relative Path: " << relativePath << IO::endl;
+    
+    //FileSystem::create_directory(project.name());
+    //FileSystem::current_path()
+
     projectDir /= project.name();
     FileSystem::current_path(projectDir);
     PrintCurrentPath();
@@ -137,20 +137,21 @@ int main(int argc, char *argv[])
 
     FileSystem::create_directory(srcDir);
     FileSystem::create_directory(includeDir);
-
+*/
     
-
     const auto FileExtension = extensions[project.programmingLanguage()];
     const auto IncludesExtension = (project.programmingLanguage() == ProgrammingLanguage::C || project.programmingLanguage() == ProgrammingLanguage::Cpp) ? includesExt[project.programmingLanguage()] : "";
 
+    /*
     std::cout << "Programming Language: " << project.programmingLanguage() << IO::endl;
     std::cout << "File extension: " << FileExtension << IO::endl;
     std::cout << "Includes Extension: " << IncludesExtension << IO::endl;
+    */
     
-
-    FileName makefileDir = projectDir.string() + "/Makefile";
+    //FileName makefileDir = projectDir.string() + "/Makefile";
+    FileName makefileName = "Makefile";
     OutputFile makefile;
-    makefile.open(makefileDir, std::ios::out);
+    makefile.open(makefileName, std::ios::out);
 
     Makefile::PrintHeading(makefile, project.name());
     Makefile::PrintHeadingBorderLine(makefile);
@@ -235,6 +236,7 @@ int main(int argc, char *argv[])
 
     makefile.close();
 
+/*
     std::string srcFile = projectDir.string() + "/src/" + project.name() + FileExtension;
     std::ofstream file;
     file.open(srcFile, std::ios::out);
