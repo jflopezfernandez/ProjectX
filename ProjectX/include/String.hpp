@@ -1,0 +1,7 @@
+
+#ifndef PROJECTX_INCLUDES_STRING_HPP_
+#define PROJECTX_INCLUDES_STRING_HPP_
+
+// TODO: Implement String.hpp
+
+#endif // PROJECTX_INCLUDES_STRING_HPP_
