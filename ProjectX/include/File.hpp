@@ -2,12 +2,6 @@
 #ifndef PROJECTX_INCLUDES_FILE_HPP_
 #define PROJECTX_INCLUDES_FILE_HPP_
 
-using FileExtension = std::string;
-using FileName      = std::string;
-
-using InputFile     = std::ifstream;
-using OutputFile    = std::ofstream;
-
 namespace File
 {
     template <typename T1, typename T2, size_t N>

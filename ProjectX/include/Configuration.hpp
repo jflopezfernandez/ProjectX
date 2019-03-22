@@ -20,6 +20,8 @@ class ProjectConfiguration
     Person              m_author;
     License             m_license;
     Version             m_version;
+    std::chrono::system_clock::time_point m_created;
+    bool                m_verbose;
 
 public:
     ProjectConfiguration()
@@ -43,6 +45,11 @@ public:
         m_comp = str;
     }
 
+    void setVerbosity(bool requested)
+    {
+        m_verbose = requested;
+    }
+
     auto name() const noexcept
     {
         return m_name;
@@ -56,6 +63,11 @@ public:
     auto compiler() const noexcept
     {
         return m_comp;
+    }
+
+    auto verbose() const noexcept
+    {
+        return m_verbose;
     }
 };
 

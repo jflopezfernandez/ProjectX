@@ -36,6 +36,7 @@ CPPFILESYSTEM  = -lstdc++fs
 LIBGMP         = -lgmp
 INTEL_MKL      = -L $(INTELMKLLIBDIR) -lmkl
 INTEL_LIBS     =    $(IPPLIB) $(IPPCPLIB)
+#BOOST_FILESYS  = -lboost_filesystem
 BOOSTOPTS      = -lboost_program_options
 BOOSTLIBS      =    $(BOOSTOPTS)
 REQLIBS        =    $(MATHLIB) $(CPPFILESYSTEM) $(LIBGMP) $(BOOSTLIBS)

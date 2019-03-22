@@ -18,28 +18,31 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <locale>
 #include <map>
 #include <memory>
 #include <optional>
 #include <ratio>
 #include <set>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <variant>
 #include <vector>
 
-namespace FileSystem = std::filesystem;
-
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include <boost/convert.hpp>
+#include <boost/convert/stream.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <boost/compute.hpp>
+/*#include <boost/filesystem.hpp>*/
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
-
-namespace Options = boost::program_options;
 
 #include <boost/algorithm/algorithm.hpp>
 #include <boost/algorithm/string.hpp>
@@ -51,18 +54,33 @@ namespace Options = boost::program_options;
 
 #include <gmp.h>
 
+using SystemClock = std::chrono::system_clock;
+using TimePoint   = std::chrono::system_clock::time_point;
+using FileExtension = std::string;
+using FileName      = std::string;
+
+using InputFile     = std::ifstream;
+using OutputFile    = std::ofstream;
+/*using FileSystemB = boost::filesystem;*/
+using DateString = std::string;
+namespace FileSystem = std::filesystem;
+namespace Options = boost::program_options;
+
+using VariableName       = std::string;
+using VariableDefinition = std::string;
+
 #include "Version.hpp"
 #include "IO.hpp"
+#include "Chrono.hpp"
+#include "Utilities.hpp"
 #include "String.hpp"
 #include "File.hpp"
+#include "Filesystem.hpp"
 #include "Person.hpp"
 #include "ProgrammingLanguages.hpp"
 #include "Compilers.hpp"
 #include "License.hpp"
 #include "Configuration.hpp"
-
-using VariableName       = std::string;
-using VariableDefinition = std::string;
 
 namespace Makefile
 {

@@ -1,4 +1,15 @@
 
+/**
+ * @file ProjectX.cpp
+ * @author Jose Fernando Lopez Fernandez <jflopezfernandez@gmail.com>
+ * @brief Main ProjectX project genereration engine file.
+ * @version 0.2.2
+ * @date 03-22-2019
+ * 
+ * @copyright Copyright (c) Jose Fernando Lopez Fernandez, 2019
+ * 
+ */
+
 #include "ProjectX.hpp"
 
 
@@ -22,6 +33,8 @@ int main(int argc, char *argv[])
 
     ProjectConfiguration project;
 
+    const DateString currentDate = X::Utils::CurrentDateString();
+
     Options::options_description optionsDescription("Program Options");
     optionsDescription.add_options()
         ("help", "Show this help message")
@@ -31,6 +44,7 @@ int main(int argc, char *argv[])
         ("author", Options::value<std::string>()->default_value("Unknown author"), "The name of the project's author.")
         ("compiler", Options::value<std::string>()->default_value("GCC"), "Project default compiler")
         ("license", "Specify the license this project will be released under.")
+        ("verbose", Options::value<bool>()->default_value(false), "Log extra debugging information during execution")
     ;
 
     Options::variables_map inputArgs;
@@ -75,6 +89,12 @@ int main(int argc, char *argv[])
         project.setCompiler(inputArgs["compiler"].as<std::string>());
     }
 
+    if (inputArgs.count("verbose")) {
+        if (inputArgs["verbose"].as<bool>()) {
+            std::clog << "Verbose mode enabled." << IO::endl;
+        }
+    }
+
     FileSystem::path projectDir = FileSystem::current_path();
 
     /** 1. Create directory
@@ -105,58 +125,22 @@ int main(int argc, char *argv[])
 
     } // End of second directory traversal.
     
-    const auto sourceDirectoryPath  = FileSystem::relative("src");
-    const auto includeDirectoryPath = FileSystem::relative("include");
+    FileSystem::path sourceDirectoryPath  = FileSystem::relative("src");
+    FileSystem::path includeDirectoryPath = FileSystem::relative("include");
 
-    FileSystem::create_directory(sourceDirectoryPath);
-    FileSystem::create_directory(includeDirectoryPath);
+    X::Filesystem::CreateDirectory(sourceDirectoryPath);
+    X::Filesystem::CreateDirectory(includeDirectoryPath);
 
-/*
-    //std::cout << "Relative Path: " << relativePath << IO::endl;
-    
-    //FileSystem::create_directory(project.name());
-    //FileSystem::current_path()
+    const auto  sourceFileExtension = extensions[project.programmingLanguage()];
+    const auto includeFileExtension = (project.programmingLanguage() == ProgrammingLanguage::C || project.programmingLanguage() == ProgrammingLanguage::Cpp) ? includesExt[project.programmingLanguage()] : "";
 
-    projectDir /= project.name();
-    FileSystem::current_path(projectDir);
-    PrintCurrentPath();
-    
-    projectDir /= project.name();
-    FileSystem::current_path(projectDir);
-    PrintCurrentPath();
-
-    // FileSystem::create_directories(projectDir);
-    // FileSystem::current_path(projectDir);
-
-    FileSystem::path srcDir = projectDir;
-    srcDir /= "src";
-    FileSystem::path includeDir = projectDir;
-    includeDir /= "include";
-
-
-
-    FileSystem::create_directory(srcDir);
-    FileSystem::create_directory(includeDir);
-*/
-    
-    const auto FileExtension = extensions[project.programmingLanguage()];
-    const auto IncludesExtension = (project.programmingLanguage() == ProgrammingLanguage::C || project.programmingLanguage() == ProgrammingLanguage::Cpp) ? includesExt[project.programmingLanguage()] : "";
-
-    /*
-    std::cout << "Programming Language: " << project.programmingLanguage() << IO::endl;
-    std::cout << "File extension: " << FileExtension << IO::endl;
-    std::cout << "Includes Extension: " << IncludesExtension << IO::endl;
-    */
-    
-    //FileName makefileDir = projectDir.string() + "/Makefile";
     FileName makefileName = "Makefile";
     OutputFile makefile;
     makefile.open(makefileName, std::ios::out);
 
     Makefile::PrintHeading(makefile, project.name());
     Makefile::PrintHeadingBorderLine(makefile);
-    
-    Makefile::PrintDoxygenDocTag(makefile, "@date", "24-Mar-2019");
+    Makefile::PrintDoxygenDocTag(makefile, "@date", currentDate);
     Makefile::PrintDoxygenDocTag(makefile, "@author", "Jose Fernando Lopez Fernandez");
     Makefile::PrintDoxygenDocTag(makefile, "@version", "0.2.0");
     Makefile::PrintHeadingBorderLine(makefile);
@@ -174,8 +158,8 @@ int main(int argc, char *argv[])
     Makefile::DefineVariable(makefile, "SHELL", "/bin/sh");
     Makefile::PrintNewLine(makefile);
 
-    Makefile::DefineVariable(makefile, "CSTD", " c11 ");
-    Makefile::DefineVariable(makefile, "CXXSTD", " c++17 ");
+    Makefile::DefineVariable(makefile, "CSTD", " -std=c11 ");
+    Makefile::DefineVariable(makefile, "CXXSTD", " -std=c++17 ");
 
     Makefile::DefineVariable(makefile, "WARNINGS", "-Wall -Wextra -Wpedantic ");
     Makefile::DefineVariable(makefile, "OPTIMIZATIONS", "-Ofast -mtune=intel -march=skylake -mavx2 ");
@@ -185,8 +169,8 @@ int main(int argc, char *argv[])
     Makefile::DefineVariable(makefile, "ASM", " nasm");
     Makefile::DefineVariable(makefile, "CC", " gcc");
     Makefile::DefineVariable(makefile, "CXX", " g++");
-    Makefile::DefineVariable(makefile, "CFLAGS", "-std=" + Makefile::Dereference("CSTD") + Makefile::Dereference("BUILDFLAGS"));
-    Makefile::DefineVariable(makefile, "CXXFLAGS", "-std=" + Makefile::Dereference("CXXSTD") + Makefile::Dereference("BUILDFLAGS"));
+    Makefile::DefineVariable(makefile, "CFLAGS", "   " + Makefile::Dereference("CSTD") + Makefile::Dereference("BUILDFLAGS"));
+    Makefile::DefineVariable(makefile, "CXXFLAGS", "   " + Makefile::Dereference("CXXSTD") + Makefile::Dereference("BUILDFLAGS"));
     Makefile::PrintNewLine(makefile);
     
     Makefile::DefineVariable(makefile, "SOURCES_DIR", " src");
@@ -236,13 +220,13 @@ int main(int argc, char *argv[])
 
     makefile.close();
 
-/*
-    std::string srcFile = projectDir.string() + "/src/" + project.name() + FileExtension;
+    const auto sourceFileName = project.name() + sourceFileExtension;
+    sourceDirectoryPath /= sourceFileName;
     std::ofstream file;
-    file.open(srcFile, std::ios::out);
+    file.open(sourceDirectoryPath, std::ios::out);
 
     file << IO::endl;
-    file << "#include \"" << project.name() + IncludesExtension << "\"" << IO::endl;
+    file << "#include \"" << project.name() + includeFileExtension << "\"" << IO::endl;
     file << IO::endl;
     file << IO::endl;
     file << "int main()" << IO::endl;
@@ -274,12 +258,14 @@ int main(int argc, char *argv[])
         CTime        = "time.h";
     }
 
-    std::string includeFile = projectDir.string() + "/include/" + project.name() + IncludesExtension;
+    const auto headerFileName = project.name() + includeFileExtension;
+    includeDirectoryPath /= headerFileName;
+
     std::ofstream headerFile;
-    headerFile.open(includeFile, std::ios::out);
+    headerFile.open(includeDirectoryPath, std::ios::out);
 
     Source::PrintNewLine(headerFile);
-    Source::PrintHeaderFileGuardStart(headerFile, project.name(), project.name(), IncludesExtension);
+    Source::PrintHeaderFileGuardStart(headerFile, project.name(), headerFileName, includeFileExtension);
     Source::PrintNewLine(headerFile);
 
     Source::IncludeHeader(headerFile, CStandardIO);
@@ -290,30 +276,38 @@ int main(int argc, char *argv[])
     Source::PrintNewLine(headerFile);
     
     if (project.programmingLanguage() == ProgrammingLanguage::Cpp) {
+        Source::IncludeHeader(headerFile, "algorithm");
         Source::IncludeHeader(headerFile, "any");
+        Source::IncludeHeader(headerFile, "chrono");
         Source::IncludeHeader(headerFile, "filesystem");
         Source::IncludeHeader(headerFile, "fstream");
+        Source::IncludeHeader(headerFile, "iomanip");
         Source::IncludeHeader(headerFile, "iostream");
         Source::IncludeHeader(headerFile, "iterator");
+        Source::IncludeHeader(headerFile, "locale");
+        Source::IncludeHeader(headerFile, "map");
         Source::IncludeHeader(headerFile, "memory");
         Source::IncludeHeader(headerFile, "optional");
+        Source::IncludeHeader(headerFile, "ratio");
+        Source::IncludeHeader(headerFile, "set");
+        Source::IncludeHeader(headerFile, "sstream");
         Source::IncludeHeader(headerFile, "string");
         Source::IncludeHeader(headerFile, "utility");
         Source::IncludeHeader(headerFile, "variant");
         Source::IncludeHeader(headerFile, "vector");
         Source::PrintNewLine(headerFile);
 
+        Source::IncludeHeader(headerFile, "boost/convert.hpp");
+        Source::IncludeHeader(headerFile, "boost/convert/stream.hpp");
         Source::IncludeHeader(headerFile, "boost/lexical_cast.hpp");
         Source::IncludeHeader(headerFile, "boost/program_options.hpp");
         Source::PrintNewLine(headerFile);     
     }
 
-    Source::PrintHeaderFileGuardEnd(headerFile, project.name(), project.name(), IncludesExtension);
+    Source::PrintHeaderFileGuardEnd(headerFile, project.name(), headerFileName, includeFileExtension);
     Source::PrintNewLine(headerFile);
 
     headerFile.close();
-
-    */
 
     return EXIT_SUCCESS;
 }
